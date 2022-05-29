@@ -9,10 +9,8 @@ use std::io;
 use std::io::Read;
 
 fn handler(req: &mut Request, pictures: &Vec<String>) -> IronResult<Response> {
-    let re = Regex::new(r"^\d+\.\d+\.\d+\.\d+").unwrap();
-    let ip = format!("{:?}", req.remote_addr);
-    let ip = re.find(ip.as_str()).unwrap().as_str().to_string();
     let mut hasher = DefaultHasher::new();
+    let ip = req.headers.get_raw("X-Real-IP").unwrap();
     ip.hash(&mut hasher);
     let hash = hasher.finish() as usize % pictures.len();
     let file = fs::File::open(format!("pictures/{}", pictures[hash])).unwrap();
